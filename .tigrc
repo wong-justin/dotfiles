@@ -1,0 +1,3 @@
+set main-view = date:relative-compact \
+		author:abbreviated,width=4 \
+		commit-title:yes,graph
