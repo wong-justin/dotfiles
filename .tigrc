@@ -1,3 +1,12 @@
 set main-view = date:relative-compact \
 		author:abbreviated,width=4 \
-		commit-title:yes,graph
+		commit-title:yes,graph,refs
+
+# bind <keymap> <key> <action>
+# keymaps include generic (every mode), main, status, and more
+bind main P !git push
+bind status P !git push
+
+bind main C ?git checkout %(branch)
+
+bind main B ?git checkout -b "%(prompt Enter new branch name: )"
