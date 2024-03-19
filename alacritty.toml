@@ -1,0 +1,27 @@
+# on Windows, put this config file at %APPDATA%/Roaming/alacritty/alacritty.toml
+# see also:
+# https://alacritty.org/config-alacritty.html
+# https://github.com/alacritty/alacritty/blob/master/docs/features.md
+# note that I can't make a symlink between %APPDATA$ and /some/wsl/path
+#   so this is just a static copy that needs continual updating...
+
+shell = "C:/Windows/System32/wsl.exe"
+working_directory = "C:/Users/jkwon/Desktop/"
+live_config_reload = true
+
+[window]
+decorations = "None"
+startup_mode = "Maximized"
+dynamic_title = true
+padding = { x = 8, y = 10 }
+opacity = 1.5
+
+[font]
+normal = { family = "Source Code Pro", style = "Regular" } # or cascadia code
+size = 11.5
+
+[keyboard]
+bindings = [
+	# { key = "W" , mods = "Control | Shift" , action = "Quit" } ,
+	{ key = " " , mods = "Control | Shift" , action = "ToggleViMode" } ,
+]
