@@ -2,6 +2,7 @@
 # see also:
 # https://alacritty.org/config-alacritty.html
 # https://github.com/alacritty/alacritty/blob/master/docs/features.md
+
 # note that I can't make a symlink between %APPDATA$ and /some/wsl/path
 #   so this is just a static copy that needs continual updating...
 
@@ -24,6 +25,8 @@ size = 10
 
 [keyboard]
 bindings = [
-	# { key = "W" , mods = "Control | Shift" , action = "Quit" } ,
+	{ key = "Q" , mods = "Control | Shift" , action = "Quit" } ,
+	{ key = "Tab" , mods = "Control" , chars = "\u001b[27;5;9~" } ,
+	{ key = "Tab" , mods = "Control | Shift" , chars = "\u001b[27;6;9~" } ,
 	{ key = " " , mods = "Control | Shift" , action = "ToggleViMode" } ,
 ]
