@@ -6,6 +6,7 @@ set main-view = date:relative-compact \
 # keymaps include generic (every mode), main, status, and more
 bind main P !git push
 bind status P !git push
+bind status C !git commit -v
 
 bind main C ?git checkout %(branch)
 
