@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# usage:
+# tput civis; and watch -t -n1 ~/personal_scripts/center_clock
+#
+#  ┌─────────────────┐
+#  │top filler spaces│
+#  │─────┌─────┐─────│
+#  │left │ msg │     │
+#  │─────└─────┘     │
+#  │                 │
+#  └─────────────────┘
+#
+# further idea:
+# to center any text, incl ansi art, maybe use ansifilter command to convert to plaintext
+
+disp_W=$(tput cols)
+disp_H=$(tput lines)
+
+msg="$(date '+%-I:%M   %p' | figlet -w $disp_W -f small_clockchars)"
+
+msg_W=$(echo "$msg" | wc -L)
+msg_H=$(echo "$msg" | wc -l)
+
+spaces() {
+  # make rect $1 lines tall with $2 spaces per line
+  printf "%$2s\n" $(seq $1) | tr "[:digit:]" " "
+}
+
+left_padding=$(( ( $disp_W - $msg_W ) / 2 ))
+top_padding=$(( ( $disp_H - $msg_H ) / 2 ))
+
+paste -d '\0' <(spaces $top_padding 0)
+# horizontal concat
+paste -d '\0' <(spaces $msg_H $left_padding) <(echo "$msg")
+
+                    

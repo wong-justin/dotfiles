@@ -1,0 +1,118 @@
+#!/bin/bash
+
+# some safety stuff, because someone said it's safe
+set -euo pipefail
+
+# if no args, or first arg is helpish, show help
+if [ $# -eq 0 ] || [[ "${1-}" =~ ^-*h(elp)?$ ]]; then
+	echo '
+bws - Control background websocket server
+
+Usage:
+  bws [start|ping|stop] <port,default=8765>
+
+Example:
+  bws start
+  ls . | entr bws ping
+  bws stop
+
+Companion webpage livereload script:
+  <script>w=new WebSocket("ws://localhost:8765");w.onmessage=()=>location.reload()</script>
+'
+	exit
+fi
+
+# if second argument exists, use as port, else default
+# just tried to choose a random port nobody uses
+# probably dont need multiple ports 
+#  - just use same websocket server across multiple projects
+port="${2:-8765}"
+
+pipe="/tmp/bws$port-pipe" # pipe file used as input for websocket server instead of stdin
+serverpidfile="/tmp/bws$port-server.pid"
+sleeppidfile="/tmp/bws$port-sleep.pid"
+statefile="/tmp/bws$port-state" # receive and store state from webapp so it can reload with same state
+
+case $1 in 
+	start)
+		#TODO: check if server already running on port
+		# Create a named pipe so that it can connect to websocat stdin/stdout and persist
+		rm -f "$pipe"
+		mkfifo "$pipe"
+
+		# Create state file for any potential client messages
+		:> "$statefile"
+
+		# Start server with websocat,
+		#  assigning pipe to that stdin,
+		#  assigning file to that stdout,
+		#  hiding stderr for aesthetics,
+		#  and running in background.
+		# Note that the server only starts when the pipe is properly opened (see below) (and the pipe must stay open)
+		websocat -s "$port" 0< "$pipe" 1> "$statefile" 2> /dev/null &
+		echo "$!" > "$serverpidfile"
+		# TODO: try making one parent PID that can kill the rest
+
+		## This while-loop keeps the pipe open.
+		## see: https://unix.stackexchange.com/a/366254
+		## Things that didn't work to keep the pipe open:
+		##   cat > "$pipe" &
+		##   cat "$pipe" > /dev/null &
+		##   exec 3> "$pipe"
+		##   (exec 1<> "$pipe"; echo tee; sed 's/e/o/g; 1q' <&1 >&2)
+		while sleep 1; do :; done > "$pipe" &
+		echo "$!" > "$sleeppidfile"
+
+		1>&2 echo "Server started at localhost:$port..."
+		;;
+	stop)
+		# stop processes and cleanup
+		pkill -F "$serverpidfile"
+		pkill -F "$sleeppidfile"
+		rm -f "$pipe" "$serverpidfile" "$sleeppidfile" "$statefile"
+		1>&2 echo "Stopped server at port $port."
+		;;
+	ping)
+		# TODO: start server if not started already
+		# TODO: send last state to pipe
+		# cat "$statefile" > "$pipe"
+		echo "hi" > "$pipe"
+		;;
+	*)
+		# print all args so you can see what you messed up
+		1>&2 echo "Invalid arguments: ${@:1}"
+esac
+
+# Notes from learning process:
+# 
+# mkfifo creates a named pipe
+# the pipe must be opened and closed just like other files
+
+# echo hi > pipe 
+#   will open the pipe and block, waiting for a reader i think, and
+# cat pipe 
+#   will print hi and close the pipe, everything done
+#  
+# ---
+# cat pipe
+#  will block, waiting, i guess receiving end is open
+# echo hi > pipe
+#  will write and everything finishes
+#
+# ---
+# 
+# redirecting means reassigning file descriptors per command (or command group, grouped with { } i think) (or unless exec, which reassigns for the whole shell session)
+# 
+# 
+# 
+# see:
+# https://tldp.org/LDP/abs/html/io-redirection.html
+# 
+# and:
+# https://unix.stackexchange.com/questions/565784/advanced-file-descriptor-redirecting-how-to-handle-multiple-file-descriptors-at
+# 
+# and:
+# https://stackoverflow.com/questions/5256599/what-are-file-descriptors-explained-in-simple-terms#comment5920429_5256599
+#
+# and:
+# https://unix.stackexchange.com/questions/522929/check-if-named-pipe-is-open-for-reading#comment966893_522940

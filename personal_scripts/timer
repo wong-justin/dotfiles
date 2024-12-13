@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# one liner:
+# tput civis; countdown=$1 start=$(date +%s) watch -tpn1 "remain="'$((start-$(date +%s)+countdown));'"test "'$(printf %.1s ''$remain'") = - && figlet -f clockchars 0 || figlet -f clockchars "'$remain'
+
+tput civis; countdown=$1 start=$(date +%s) watch -tpn1 "remain="'$((start-$(date +%s)+countdown));'"test "'$(printf %.1s ''$remain'") = - && figlet -f clockchars 0:00 || figlet -f clockchars "'$(date -u -d @${remain} +\"%-M:%S\")'
+
+# tput cup 0 $((cols/2 - ...)
+# maybe get figlet to print in reverse, to help with right alignment, if that'll work
+
+# explanation:
+# =====
+# tput civis # hide cursor
+# countdown=$1 # num seconds to count, given as argument to script
+# start=$(date +%s) # current time in seconds since epoch
+# watch -tpn1 # run following command every second with high precision, and nice redraw on change
+#   remain=$((start-$date +%s)+countdown)) # simple math
+#   test $(printf %.1s $remain) = - # check if the time becomes negative by looking for hyphen at first char
+#   && echo 0 || echo $remain # if negative, just print 0, else print normal
+#   | figlet -f clockchars # nice font
+#
+# have to ctrl-c to quit and tput cvvis/cnorm to show cursor again
+
+# ALTERNATIVES
+
+# loop without a sleep. con: screen flickering
+# ======
+# clear
+# tput civis
+# seconds=$1
+# start="$(($(date +%s) + $seconds))"
+# while [ "$start" -ge `date +%s` ]; do
+#     time="$(( $start - `date +%s` ))"
+#     printf '%s\r' "$(date -u -d "@$time" +%H:%M:%S)" | figlet -f clockchars
+#     clear
+# done
+
+# countdown=6 start=$(date +%s) watch -tpn1 "remain="'$((start-$(date +%s)+countdown));'"echo "'$(printf %.1s $remain'")"
+
+# loop with sleep and simpler integer countdown. con: can't redraw figlet with carriage return ansi code.
+# ======
+# clear; for i in `seq 600 -1 1` ; do echo -ne "\r$i " | figlet -f clockchars ; sleep 1 ; done
+
