@@ -1,3 +1,5 @@
+# note: new aliases are concatenated at the bottom of the file
+#
 # fun fact: to temporarily run a command with aliases disabled,
 # prepend a backslash, eg: \grep
 # note: this will not disable functions, only aliases
@@ -6,14 +8,22 @@
 #
 # use my alias alias pretty much the same as normal \alias, ie:
 #   
-#   `alias test "echo hello world"`
+#   `alias test 'echo hello world'`
 #
-# then it will be immediately usable and also persisted in this .bash_aliases file
+# then it will be immediately usable and also persisted in this .bash_aliases file,
+# instead of default behavior where you must source ~/.bash_aliases afterwards
 #
 # IN MORE DETAIL
 #
 # it's partly taken from: https://unix.stackexchange.com/q/153977
 # here is the un-minified approximation:
+#
+# function newalias {
+# 	echo "\alias $1='${@:2}'" >> ~/.bash_aliases
+# 	source ~/.bash_aliases
+# }
+#
+# or longer, and not just the happy path:
 #
 # function newalias {
 # 	_name="$1"
@@ -25,11 +35,11 @@
 # 		source ~/.bash_aliases
 # 	fi
 # }
-\alias alias='f(){ if [ -z "$1" ]; then echo "no alias given" >&2; else echo "\alias $1='\''"${@:2}"'\''" >> ~/.bash_aliases && source ~/.bash_aliases; fi; unset -f f; }; f'
 
-# normal aliases below
-\alias aliases='\alias'
-\alias l='ls -CAp --color=never --group-directories'
+\alias alias='f(){ if [ -z "$1" ]; then echo "no alias given" >&2; else echo "\alias $1='\''"${@:2}"'\''" >> ~/.bash_aliases && source ~/.bash_aliases; fi; unset -f f; }; f'
+\alias aliases='nvim ~/.bash_aliases -c '\''normal G'\''; source ~/.bash_aliases'
+  # or maybe aliases='source ~/.bash_aliases; \alias'
+\alias l='ls -CAp --color=never --group-directories-first'
 \alias lss='ls -gGAh --group-directories-first --classify --color=never'
 \alias vim='nvim'
 \alias ..='cd ..'
@@ -39,5 +49,18 @@
 \alias clock='tput civis; watch -t -n1 ~/dotfiles/scripts/center_clock'
 \alias screenshot='xwd -root | ffmpeg -i - ~/screenshots/$(date +"%FT%H%M").png'
 # \alias firefox='firefox --profile ~/.config/firefox_profiles/me' # creates problems with symlinks, i think
-
-# new aliases are added after this line
+\alias slippi='slippi-launcher &'
+\alias joke='curl https://icanhazdadjoke.com && echo'
+\alias cx='chmod +x'
+\alias vic='/home/wonger/builds/vic/target/release/vic'
+\alias oops='$(fc -ln -2 -2 | sed '\''s/^s*/sudo /g'\'')'
+  # this is basically oops='sudo !!'
+\alias rm='rm -I'
+\alias fd='fd -c never'
+\alias find='fd'
+\alias clip='xclip -selection clipboard'
+\alias unclip='xclip -selection clipboard -o'
+\alias prose='/home/wonger/builds/writenow/writenow -o ~/prose/$(date +%Y-%m-%d).txt; echo >> ~/prose/$(date +%Y-%m-%d).txt'
+\alias today='date +%Y-%m-%d'
+\alias setvol='wpctl set-volume @DEFAULT_AUDIO_SINK@'
+\alias getvol='wpctl get-volume @DEFAULT_AUDIO_SINK@'
