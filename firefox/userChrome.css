@@ -1,5 +1,7 @@
 /* adapted from https://github.com/ericmurphyxyz/userChrome.css */
-/* this file goes somewhere like Firefox/Profiles/acdef.default/chrome/userChrome.css */
+/* this file goes somewhere like Firefox/Profiles/acdef-1234.default/chrome/userChrome.css */
+/* and in firefox about:config, check the toolkit.lefgcyuserprofilecuzotmiaations.stylehssets */
+/* this userChrome requires vertical tabs.
 
 /* Base color for the theme, dependent on whether it's a light theme or not */
 @media (prefers-color-scheme: dark) {
@@ -180,15 +182,9 @@ toolbarspring {
 
 /* before, vertical tab bar was 51px wide. so i need to change some attribs like padding so that vert tab bar is now 40px wide, same as horiz navbar being 40px tall
  * EDIT - 40px looks a tad too skinny actually
+ * depends on the device and rendering apparently; just pixel pushing until it looks right
  */
 #sidebar-main {
 	max-width: 48px !important;
 	margin-left: -6px !important;
 }
-
-/* didnt work:
-.tab-content {
-	padding: 0 calc(var(--tab-inline-padding) - 5px) !important;
-}
-*/
-
