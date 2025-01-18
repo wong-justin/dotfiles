@@ -1,27 +1,4 @@
-" from WSL/Ubuntu config
-
-" All system-wide defaults are set in $VIMRUNTIME/debian.vim and sourced by
-" the call to :runtime you can find below.  If you wish to change any of those
-" settings, you should do it in this file (/etc/vim/vimrc), since debian.vim
-" will be overwritten everytime an upgrade of the vim packages is performed.
-" It is recommended to make changes after sourcing debian.vim since it alters
-" the value of the 'compatible' option.
-
-" This line should not be removed as it ensures that various options are
-" properly set to work with the Vim-related packages available in Debian.
-runtime! debian.vim
-
-" Vim will load $VIMRUNTIME/defaults.vim if the user does not have a vimrc.
-" This happens after /etc/vim/vimrc(.local) are loaded, so it will override
-" any settings in these files.
-" If you don't want that to happen, uncomment the below line to prevent
-" defaults.vim from being loaded.
-let g:skip_defaults_vim = 1
-
-" Uncomment the next line to make Vim more Vi-compatible
-" NOTE: debian.vim sets 'nocompatible'.  Setting 'compatible' changes numerous
-" options, so any other options should be set AFTER setting 'compatible'.
-"set compatible
+" updated for my Arch machine
 
 " Vim5 and later versions support syntax highlighting. Uncommenting the next
 " line enables syntax highlighting by default.
@@ -80,12 +57,16 @@ set splitbelow
 " opens terminal in curr window
 " assumes splitbelow=true
 " command Term normal :term<CR><C-W>k:q!<CR><C-W>j
-command! Term normal :term<CR><C-W>k:q!<CR>
+" EDIT - nvm, i never use embedded temrinals or vim windows anymore
+"
+" command! Term normal :term<CR><C-W>k:q!<CR>
 
 " make vertical window split behave like horiz
 " assumes vsplit goes right
-nnoremap <C-W>v <C-W>v<C-W>l:enew<CR>
-" nnoremap <C-W><C-V> <C-W>v<C-W>l:enew<CR>
+" EDIT - nvm, i never use vim windows anymore
+"
+" nnoremap <C-W>v <C-W>v<C-W>l:enew<CR>
+"" nnoremap <C-W><C-V> <C-W>v<C-W>l:enew<CR>
 
 " save on every Esc
 " although this can cause buggy behavior: https://stackoverflow.com/q/11940801
@@ -185,6 +166,10 @@ autocmd! FileType ocaml nnoremap <leader>w :OcamlFormat<CR>
 command! RustFormat normal mm:%!rustfmt --edition 2021<CR>`m
 autocmd! FileType rust nnoremap <leader>w :RustFormat<CR>
 
+" html autoformatting
+command! HtmlFormat normal mm:%!superhtml fmt --stdin<CR>`m
+autocmd! FileType html nnoremap <leader>w :HtmlFormat<CR>
+
 
 " make .svelte like .html
 au BufRead,BufNewFile *.svelte setfiletype html
@@ -199,9 +184,13 @@ nnoremap <C-Q> <C-V>
 
 " open url in browser (assuming url was just yanked to default register)
 " command! Web normal :!~/personal_scripts/browse.sh '<C-R>"'<CR>
-command! Web normal :!cmd.exe /C min '<C-R>"'<CR>
-nnoremap <leader>u :Web<CR>
-vnoremap <leader>u y:Web<CR>
+" test with: https://wonger.dev/clark/readme#:~:text=keep%20everything%20in%20the%20command%2Dline
+" EDIT - nvm, `gx` over links will open automatically with non-windows vim 7.4+,
+" at least when the cursor is before the anchor # fragment
+"
+" command! Web normal :!cmd.exe /C min '<C-R>"'<CR>
+" nnoremap <leader>u :Web<CR>
+" vnoremap <leader>u y:Web<CR>
 
 " highlight search matches
 set hlsearch
@@ -265,24 +254,39 @@ autocmd BufEnter * syntax sync fromstart
 nnoremap <leader>l <Esc>:syntax sync fromstart<CR>
 
 " copy selection to windows clipboard (not utf-8 tho) (works in wsl too)
-vnoremap <S-C> :w !cmd.exe /C clip.exe<CR><CR>
+" EDIT - not on windows now
+"
+" vnoremap <S-C> :w !cmd.exe /C clip.exe<CR><CR>
 
-" connect nvim to system clipboard command
+" connect nvim to xclip keyboard
 " :h clipboard
 " it works differently (better) than normal vim
 set clipboard+=unnamedplus
 let g:clipboard = {
-	\ 'name': 'win32yank-wsl',
+	\ 'name': 'xclip-clipboard-everywhere',
 	\ 'copy': {
-	\	'+': 'win32yank.exe -i --crlf',
-	\	'*': 'win32yank.exe -i --crlf',
+	\	'+': 'xclip -i -selection clipboard',
+	\	'*': 'xclip -i -selection clipboard',
 	\ },
 	\ 'paste': {
-	\	'+': 'win32yank.exe -o --lf',
-	\	'*': 'win32yank.exe -o --lf',
+	\	'+': 'xclip -o -selection clipboard',
+	\	'*': 'xclip -o -selection clipboard',
 	\ },
 	\ 'cache_enabled': 0,
 	\ }
+" or connect nvim to windows system clipboard command
+" let g:clipboard = {
+" 	\ 'name': 'win32yank-wsl',
+" 	\ 'copy': {
+" 	\	'+': 'win32yank.exe -i --crlf',
+" 	\	'*': 'win32yank.exe -i --crlf',
+" 	\ },
+" 	\ 'paste': {
+" 	\	'+': 'win32yank.exe -o --lf',
+" 	\	'*': 'win32yank.exe -o --lf',
+" 	\ },
+" 	\ 'cache_enabled': 0,
+" 	\ }
 
 " convenience for default registers == system clipboard
 " vnoremap <leader>y "+y
@@ -322,17 +326,28 @@ nnoremap <leader>k :call MoveToWindowAbove()<CR>
 " nnoremap <leader>j :winc j<CR>
 " nnoremap <leader>k :winc k<CR>
 
-
+" use terminal color palette
+" apaprently using 16 terminal colors is already the default??
+" and apparently i shouldnt have to set t_Co if my terminal is 
+" correctly configured
+" set t_Co=16
+"
+" EDIT - apparently truecolor is enabled by defeault, probs because ghostty
+" sets $COLORTERM=truecolor
+"
+" to disable truecolor, and conseuqently enable default terminal theme colors,
+" set notermguicolors
 
 
 
 " PLUGINS
 " =======
-call plug#begin('~/.vim/plugged')
-
-Plug 'andys8/vim-elm-syntax'
-
-call plug#end()
+"
+" call plug#begin('~/.vim/plugged')
+" 
+" Plug 'andys8/vim-elm-syntax'
+" 
+" call plug#end()
 
 
 
@@ -541,7 +556,8 @@ call plug#end()
 " 	endfor
 " endfunction
 
-source $VIMRUNTIME/defaults.vim
+" used in ubuntu's default config/dotfiles forced upon me from wsl
+" source $VIMRUNTIME/defaults.vim
 
 " resolve utf-8 / cursor issue (??) with WSL
 " https://superuser.com/a/553610
