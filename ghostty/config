@@ -1,0 +1,160 @@
+# for hacky livereload for now, until ghostty updates with a cli reload command:
+# send keypresses with
+# echo ~/.config/ghostty/config | entr -cs 'xdotool key ctrl+shift+comma'
+#
+# to get nvim to use this terminal theme, :set notermguicolors
+
+font-family = "Source Code Pro"
+font-size = 14
+window-decoration = false
+confirm-close-surface = false
+desktop-notifications = false
+resize-overlay = never
+window-padding-balance = true
+
+# remember some default keybinds:
+# reload config = ctrl+shift+comma
+
+# COLORS
+
+# (use this visualizer: https://lawlesscreation.github.io/hex-color-visualiser/)
+# terminal 16 colors is usually:
+# 0 black
+# 1 red
+# 2 green
+# 3 yellow
+# 4 blue
+# 5 purple
+# 6 cyan
+# 7 white
+# and 8-15 are bright versions of those
+
+# although nvim :h cterm-colors says
+# 0 black
+# 1 blue
+# 2 green
+# 3 cyan
+# 4 red
+# 5 magenta
+# 6 brown
+# 7 light gray
+# and 8-15 are brighter versions, ie.
+# 8 dark grey
+# 9 light blue
+# 10 light green
+# 11 light cyan
+# 12 light red
+# 13 light magenta
+# 14 yellow
+# 15 twhi
+
+# copying neovim default dark palette, something like
+#005078
+#007676
+#015825
+#0a0b10
+#1c1d23
+#2c2e33
+#4f5258
+#4c0049
+#5e0009
+#6e5600
+#9fd8ff
+#83efef
+#aaedb7
+#ebeef5
+#d7dae1
+#c4c6cd
+#9b9ea4
+#ffc3fa
+#ffbcb5
+#f4d88c
+# or some other some vim palette:
+#007373
+#07080d
+#14161b
+#2c2e33
+#4f5258
+#590008
+#6b5300
+#8cf8f7
+#9b9ea4
+#a6dbff
+#b3f6c0
+#c4c6cd
+#e0e2ea
+#eef1f8
+#fce094
+#ff0000
+#ffc0b9
+# source i think is :runtime syntax/hitest.vim, then :TOhtml
+# see also :runtime colors/default.vim
+# and this is a helpful comment: https://vi.stackexchange.com/a/8585
+
+# compare with ghostty default 16 palette (source: ghostty +show-config --default)
+
+# # palette = 0=#1d1f21
+# # palette = 1=#cc6666
+# # palette = 2=#b5bd68
+# # palette = 3=#f0c674
+# # palette = 4=#81a2be
+# # palette = 5=#b294bb
+# # palette = 6=#8abeb7
+# # palette = 7=#c5c8c6
+# # palette = 8=#666666
+# # palette = 9=#d54e53
+# # palette = 10=#b9ca4a
+# # palette = 11=#e7c547
+# # palette = 12=#7aa6da
+# # palette = 13=#c397d8
+# # palette = 14=#70c0b1
+# # palette = 15=#eaeaea
+
+# 8 good colors from above neovim palette:
+# palette = 0=#14161b
+# palette = 1=#ffc0b9
+# palette = 2=#b3f6c0
+# palette = 3=#fce094
+# palette = 4=#a6dbff
+# palette = 5=#007373
+# palette = 6=#4f5258
+# palette = 7=#eef1f8
+# # fg/bg
+# foreground = #e0e2ea
+# background = #14161b
+# # fillers until i figure out the rest
+# palette = 8=#ff0000
+# palette = 9=#ff0000
+# palette = 10=#ff0000
+# palette = 11=#ff0000
+# palette = 12=#ff0000
+# palette = 13=#ff0000
+# palette = 14=#ff0000
+# palette = 15=#ff0000
+# unused:
+#c4c6cd
+#07080d
+#2c2e33
+#590008
+#6b5300
+#8cf8f7
+#9b9ea4
+#e0e2ea
+#ff0000
+
+theme = NvimDark
+# i also like...
+# the default,
+# vesper,
+# catpuccin-mocha, 
+# Dracula,
+# iTerm2 Pastel Dark Background,
+# iTerm2 Tango Dark,
+# iTerm2 Tango Dark,
+# Monokai Pro Spectrum,
+# Nightlion v2, 
+# starlight,
+# tokyonight,
+# Tomorrow Night Bright,
+# UltraDark,
+# and maybe Peppermint
