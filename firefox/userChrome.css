@@ -1,7 +1,15 @@
-/* adapted from https://github.com/ericmurphyxyz/userChrome.css */
-/* this file goes somewhere like Firefox/Profiles/acdef-1234.default/chrome/userChrome.css */
-/* and in firefox about:config, check the toolkit.lefgcyuserprofilecuzotmiaations.stylehssets */
-/* this userChrome requires vertical tabs.
+/* adapted from https://github.com/ericmurphyxyz/userChrome.css
+ * this file goes somewhere like Firefox/Profiles/acdef.default/chrome/userChrome.css 
+ * and in firefox about:config, check the toolkit.lefgcyuserprofilecuzotmiaations.stylehssets 
+ * 
+ * to inspect the browser chrome, goto F12 dev tools settings, and under advanced settings at bottom enable browser chrome debugging toolboxes and remote debugging.
+ * Then press ctrl-alt-shift-i to open the inspector
+ *
+ * bonus debugging tip: to inspect elements that disappear on mouse leave, find a parent element in the sidebar devtools source, right click break on > subtree modification, trigger your mouse action on the page, and then step thru with the debugger until your element appears
+ * taken from: https://stackoverflow.com/a/34095731
+ */
+
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
 /* Base color for the theme, dependent on whether it's a light theme or not */
 @media (prefers-color-scheme: dark) {
@@ -37,7 +45,13 @@ toolbar#nav-bar {
 }
 
 #urlbar-background {
+	/* for some reason, this element does not have --accent-color defined here,
+	 * resulting in a transparent box with poor contrast.
+	 * tested on firefox v133.0.3 on arch 
+	 * 
+	 * solution: hardcode a color... */
     background: var(--accent-color) !important;
+    background: #1c1b22 !important;
     border: none !important;
 }
 
@@ -177,14 +191,21 @@ toolbarspring {
 
 /* hide extension buttons */
 .toolbaritem-combined-buttons.unified-extensions-item.chromeclass-toolbar-additional {
-	display: none !important;
+	/* display: none !important; */
 }
 
 /* before, vertical tab bar was 51px wide. so i need to change some attribs like padding so that vert tab bar is now 40px wide, same as horiz navbar being 40px tall
  * EDIT - 40px looks a tad too skinny actually
- * depends on the device and rendering apparently; just pixel pushing until it looks right
  */
+
 #sidebar-main {
-	max-width: 48px !important;
-	margin-left: -6px !important;
+	max-width: 49px !important;
+	margin-left: -7px !important;
 }
+
+/* didnt work:
+.tab-content {
+	padding: 0 calc(var(--tab-inline-padding) - 5px) !important;
+}
+*/
+
