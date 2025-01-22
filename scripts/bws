@@ -80,7 +80,7 @@ case $1 in
 		;;
 	*)
 		# print all args so you can see what you messed up
-		1>&2 echo "Invalid arguments: ${@:1}"
+		1>&2 echo "Invalid arguments: " "${@:1}"
 esac
 
 # Notes from learning process:

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# some safety stuff, because someone said it's safe
+set -euo pipefail
+
 # usage:
 # tput civis; and watch -t -n1 ~/personal_scripts/center_clock
 #
@@ -17,19 +20,19 @@
 disp_W=$(tput cols)
 disp_H=$(tput lines)
 
-msg="$(date '+%-I:%M   %p' | figlet -w $disp_W -f clockchars)"
+msg="$(date '+%-I:%M   %p' | figlet -w "$disp_W" -f clockchars)"
 
 msg_W=$(echo "$msg" | wc -L)
 msg_H=$(echo "$msg" | wc -l)
 
-left_padding=$(( ( $disp_W - $msg_W ) / 2 ))
-top_padding=$(( ( $disp_H - $msg_H ) / 2 ))
+left_padding=$(( ( disp_W - msg_W ) / 2 ))
+top_padding=$(( ( disp_H - msg_H ) / 2 ))
 
 spaces() {
   # make rect $1 lines tall with $2 spaces per line
-  printf "%$2s\n" $(seq $1) | tr "[:digit:]" " "
+  printf "%$2s\n" $(seq "$1") | tr "[:digit:]" " "
 }
 
-paste -d '\0' <(spaces $top_padding 0)
+paste -d '\0' <(spaces "$top_padding" 0)
 # horizontal concat
-paste -d '\0' <(spaces $msg_H $left_padding) <(echo "$msg")
+paste -d '\0' <(spaces "$msg_H" "$left_padding") <(echo "$msg")
