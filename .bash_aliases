@@ -10,8 +10,7 @@
 #   
 #   `alias test 'echo hello world'`
 #
-# then it will be immediately usable and also persisted in this .bash_aliases file,
-# instead of default behavior where you must source ~/.bash_aliases afterwards
+# then it will be immediately usable and also persisted in this .bash_aliases file
 #
 # IN MORE DETAIL
 #
@@ -45,7 +44,7 @@
 \alias ..='cd ..'
 \alias ~='cd ~'
 \alias grep='grep --color=auto'
-\alias fm='cd $(~/builds/fmin/target/debug/fmin)'
+\alias fm='cd $(~/builds/fmin/target/release/fmin)'
 \alias clock='tput civis; watch -t -n1 ~/dotfiles/scripts/center_clock'
 \alias screenshot='xwd -root | ffmpeg -i - ~/screenshots/$(date +"%FT%H%M").png'
 # \alias firefox='firefox --profile ~/.config/firefox_profiles/me' # creates problems with symlinks, i think
@@ -53,7 +52,7 @@
 \alias joke='curl https://icanhazdadjoke.com && echo'
 \alias cx='chmod +x'
 \alias vic='/home/wonger/builds/vic/target/release/vic'
-\alias oops='$(fc -ln -2 -2 | sed '\''s/^s*/sudo /g'\'')'
+\alias oops='$(fc -ln -2 -2 | sed '\''s/^/sudo /g'\'')'
   # this is basically oops='sudo !!'
 \alias rm='rm -I'
 \alias fd='fd -c never'
@@ -64,3 +63,19 @@
 \alias today='date +%Y-%m-%d'
 \alias setvol='wpctl set-volume @DEFAULT_AUDIO_SINK@'
 \alias getvol='wpctl get-volume @DEFAULT_AUDIO_SINK@'
+\alias nugget='P="/home/wonger/wonger.dev/dist/nuggets.html";N=$(( $(cat "$P" | htmlq ".card" --attribute id | sed "s/n//" | sort -n | tail -1) + 1)); echo $N; cat "$P" | htmlq ".card:first-of-type" -r '\''.card > *:not(.bottom-line)'\'' | sed '\''s/datetime=".*"/datetime="'\''"$(date +%Y-%m-%d)"'\''"/'\'' | sed -E '\''s/(n|#)[0-9]+/\1'\''$N'\''/'\'' | clip; vim "$P" -c "/class=\"card" -c "normal O" -c "r !xclip -selection clipboard -o" -c "normal 2o" -c "normal 7ki<p>TODO: new nugget</p>" -c "normal 0w" -c "let @/ = \"\""'
+  # aka
+  #
+  # N=$(( $(cat nuggets.html | htmlq ".card" --attribute id | sed "s/n//" | sort -n | tail -1) + 1)); cat nuggets.html | htmlq ".card:first-of-type" -r '.card > *:not(.bottom-line)' | sed 's/datetime=".*"/datetime="'"$(date +%Y-%m-%d)"'"/' | sed -E 's/(n|#)[0-9]+/\1'$N'/' | clip; vim nuggets.html -c "/class=\"card" -c 'normal O' -c 'r !xclip -selection clipboard -o' -c 'normal 2o' -c "normal 7k"
+  #
+  # aka
+  #
+  # P=~/wonger.dev/dist/nuggets.html;
+  # and
+  # N=$(( $(cat $P | htmlq ".card" --attribute id | sed "s/n//" | sort -n | tail -1) + 1)); 
+  # and
+  # cat $P | htmlq ".card:first-of-type" -r '.card > *:not(.bottom-line)' | sed 's/datetime=".*"/datetime="'"$(date +%Y-%m-%d)"'"/' | sed -E 's/(n|#)[0-9]+/\1'$N'/' | clip;
+  # then
+  # vim $P -c "/class=\"card" -c "normal O" -c "r !xclip -selection clipboard -o" -c "normal 2o" -c "normal 7ki<p>TODO: new nugget</p>" -c "normal 0w" -c "let @/ = \"\""'
+  #
+  # I should make a lil blog post breakdown for this... sharing about escaping quotes, shell expansions (when they happen or not), vim -c startup option and command format, htmlq tool, sed regex... all for a microblogging shortcut within plain html
