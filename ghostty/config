@@ -6,14 +6,30 @@
 
 font-family = "Source Code Pro"
 font-size = 14
-window-decoration = false
+
+# i try to avoid gtk widgets
+gtk-adwaita = false
+gtk-titlebar = false
+# preserve i3 borders?
+window-decoration = none
+
+# https://github.com/ghostty-org/ghostty/issues/2023
+# gtk-adwaita = false
+gtk-custom-css = "~/.config/ghostty/gtk-fix.css"
+
+window-padding-balance = true
 confirm-close-surface = false
 desktop-notifications = false
 resize-overlay = never
-window-padding-balance = true
+window-inherit-working-directory = true 
 
 # remember some default keybinds:
 # reload config = ctrl+shift+comma
+
+# default keybind is = ctrl+shift+n=new_window 
+# i would like to make keybind = alt+enter=new_window 
+# taking advantage of ghostty's window-inherit-working-directory
+# since i3 always opens home dir ~
 
 # COLORS
 
