@@ -43,37 +43,32 @@ LESS=-RIj.5
 #
 # ALIASING THE ALIAS
 #
-# use my alias alias pretty much the same as normal \alias, ie:
+# use my alias alias the same as normal \alias, ie:
 #   
-#   `alias test 'echo hello world'`
+#   `alias test='echo hello world'`
 #
-# then it will be immediately usable and also persisted in this .bash_aliases file
-#
-# IN MORE DETAIL
-#
+# then it will be immediately usable and also persisted in this .bashrc file
 # it's partly taken from: https://unix.stackexchange.com/q/153977
-# here is the un-minified approximation:
 #
-# function newalias {
-# 	echo "\alias $1='${@:2}'" >> ~/.bash_aliases
-# 	source ~/.bash_aliases
-# }
-#
-# or longer, and not just the happy path:
-#
-# function newalias {
-# 	_name="$1"
-# 	_command="${@:2}"
-# 	if [ -z "$_name" ]; then
-# 		echo "no alias given" >&2;
-# 	else
-# 		echo "\alias $_name='$_command'" >> ~/.bash_aliases
-# 		source ~/.bash_aliases
-# 	fi
-# }
-\alias alias='f(){ if [ -z "$1" ]; then echo "no alias given" >&2; else echo "\alias $1='\''"${@:2}"'\''" >> ~/.bashrc && source ~/.bashrc; fi; unset -f f; }; f'
-\alias aliases='nvim ~/.bashrc -c "normal G"; source ~/.bashrc'
+# checks that $1 matches format name=command
+# and appends \alias name='command' to .bashrc
+
+\alias alias='f(){
+  _name="${1%%=*}"
+  _command="${1#*=}"
+  _quoted_command="${_command@Q}"
+  if [ -z "$_name" ] || [ -z "$_command" ] || [ "$_name" == "$_command" ]; then
+    echo "incorrect format... use alias name='\''command'\''" >&2
+  else
+    echo "\\alias $_name=$_quoted_command" >> ~/.bashrc && source ~/.bashrc
+  fi;
+  unset -f f
+}; f'
+  # note that name == command happens when no equal sign is present
+  # this actually fails on certain cases: echo "\\alias $_name='\''"$_command"'\''" >> ~/.bashrc && source ~/.bashrc
+\alias aliases='vim ~/.bashrc -c "normal G"; source ~/.bashrc'
   # or maybe aliases='source ~/.bashrc; \alias'
+
 \alias l='ls -CAp --color=never --group-directories-first'
 \alias lss='ls -gGAh --group-directories-first --classify --color=never'
 \alias vim='nvim'
@@ -102,14 +97,12 @@ LESS=-RIj.5
 \alias getvol='wpctl get-volume @DEFAULT_AUDIO_SINK@'
 # \alias nug="nuggets_path=~/wonger.dev/dist/nuggets.html;"'export new_nugget=$(cat $nuggets_path | htmlq .card:first-of-type -r '\''.card > *:not(.bottom-line)'\'' | sed '\''s/datetime=".*"/datetime="'\''$(date +%Y-%m-%d)'\''"/'\'' | perl -pe '\''s/(#|n)([0-9]+)/$1.($2+1)/e'\'' ); vim $nuggets_path -c /class=\"card -c "let @/ = \"\"" -c "normal O" -c "r !echo \"\$new_nugget\"" -c "normal 2o" -c "normal 6ki<p></p>" -c "normal 02f<" -c startinsert'
 \alias nug='nuggets_path=$HOME/wonger.dev/dist/nuggets.html;(
-
 export new_nugget="$(
   cat $nuggets_path | 
     htmlq .card:first-of-type -r '\''.card > *:not(.bottom-line)'\'' | 
     sed '\''s/datetime=".*"/datetime="'\''$(date +%Y-%m-%d)'\''"/'\'' | 
     perl -pe '\''s/(#|n)([0-9]+)/$1.($2+1)/e'\'' 
 )"
-
 vim $nuggets_path \
   -c /class=\"card \
   -c "let @/ = \"\"" \
@@ -117,7 +110,7 @@ vim $nuggets_path \
   -c "r !echo \"\$new_nugget\"" \
   -c "normal 2o" \
   -c "normal 6ki<p></p>" \
-  -c "normal 02f<" \
+  -c "normal ^f<" \
   -c startinsert
 )'
 # \alias please or howto=something like 'llm what is the shell command for $1'
@@ -125,6 +118,12 @@ vim $nuggets_path \
 \alias chat='llama-cli --hf-repo ggml-org/Qwen2.5-Coder-3B-Q8_0-GGUF --hf-file qwen2.5-coder-3b-q8_0.gguf --conversation -p "Make responses short. Only include necessary information." --no-display-prompt 2>/dev/null'
   # results as of Feb 2025: this local model is utterly slow and useless
 \alias bws="~/dotfiles/scripts/bws"
+\alias fetch='neofetch'
+\alias expansion_test="echo '~';"'echo ~;'"echo ~;"'echo '\''$(echo ~);'\'
+\alias date1="echo $(date)" # bad
+\alias date2='echo $(date)' # good
+\alias date3="echo \$(date)" # good
+\alias repeat='f(){ for arg in "$@"; do echo "$arg"; done; unset -f f; }; f'
 \alias multiline_test='(
 echo hello \
 world
@@ -157,9 +156,5 @@ echo end'
   # where the alias works as expected (outputs start\nend)
   # - happens in ghostty terminal emulator, but not alacritty as far as i can tell
   # - weird
-\alias expansion_test="echo '~';"'echo ~;'"echo ~;"'echo '\''$(echo ~);'\'
-\alias date1="echo $(date)" # bad
-\alias date2='echo $(date)' # good
-\alias date3="echo \$(date)" # good
-\alias fetch='neofetch'
-\alias repeat='f(){ for arg in "$@"; do echo "$arg"; done; unset -f f; }; f'
+\alias getbrightness='ddcutil getvcp 10'
+\alias setbrightness='f(){ ddcutil setvcp 10 "$1"; unset -f f; }; f'
