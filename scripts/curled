@@ -1,0 +1,141 @@
+#!/usr/bin/env -S bash
+#
+# curled - cache URL content and output the filepath
+#
+# example usage
+# ```
+# myscript -f $(curled example.com/asset)
+# ```
+#
+# instead of the alternative
+# ```
+# curl example.com/asset -o /my/file
+# myscript -f /my/file
+# ```
+#
+# useful when a command expects a filepath and cannot accept a file at a URL
+# also when you want to cache a web request during iterative testing
+# also when you dont want to think of a filename for something ephemeral
+#
+# more examples:
+# ghostty --config-file=$(curled https://raw.githubusercontent.com/catppuccin/ghostty/refs/heads/main/themes/catppuccin-frappe.conf) # testing theme files from the internet
+# figlet -f $(curled wonger.dev/assets/clockchars.flf) "12:34 pm", except figlet is bugging out that the file does not have a .flf extension :(
+# qpdf $(curled wonger.dev/assets/gsoc_proposal.pdf) -
+#
+# other names i brainstormed:
+# cachedcurl
+# got
+# downloadsomewhere
+# cath
+# simplecachedcurl
+# acachingcommandlineproxycurlwrapper
+#
+# see also: https://github.com/dimo414/bkt
+#
+# (warning: this script is mostly LLM generated)
+
+set -e
+
+err() {
+  echo "Error: $*" >&2
+}
+
+needs() { 
+  command -v "$1" >/dev/null || (err "Dependency not found:" "$1"; exit 1)
+}
+
+function show_usage() {
+  echo "Usage: curled <url> [--fresh|--exists]"
+  echo "  --fresh   Force download even if cached version exists"
+  echo "  --exists  Output filepath if cached version exists, otherwise exit with error"
+  exit 1
+}
+
+# Check dependencies
+needs "curl"
+
+# Try to find an existing MD5 command
+if command -v md5sum >/dev/null; then
+  md5_cmd="md5sum | cut -d' ' -f1"
+elif command -v md5 >/dev/null; then
+  md5_cmd="md5 -q"
+else
+  err "No MD5 command found. Please install md5sum or md5."
+  exit 1
+fi
+
+# Process args
+if [ $# -lt 1 ]; then
+  show_usage
+fi
+
+url="$1"
+shift
+force_download=false
+check_exists_only=false
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --fresh)
+      force_download=true
+      ;;
+    --exists)
+      check_exists_only=true
+      ;;
+    *)
+      err "Unknown option $1"
+      show_usage
+      ;;
+  esac
+  shift
+done
+
+if [ "$force_download" = true ] && [ "$check_exists_only" = true ]; then
+  err "Cannot use --fresh and --exists at the same time"
+  show_usage
+fi
+
+# Create cache directory if it doesn't exist
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/curled"
+mkdir -p "$cache_dir"
+
+# Generate a unique filename for the URL
+# If the URL file has an extension, then append that to the filename to prevent
+# some tools from complaining about missing suffixes (looking at you, figlet).
+extension=""
+filename_part=$(echo "$url" | sed -E 's/.*\/([^/?#]+)(\?.*)?$/\1/') # Get the filename part after the last /
+                                                                    # idk how robust this regex is :shrug:
+if [[ "$filename_part" == *.* ]]; then
+    extension=$(echo "$filename_part" | sed -E 's/.*\.([^.]+)$/\1/')
+fi
+filename=$(echo "$url" | eval "$md5_cmd")
+if [ -n "$extension" ]; then
+    filepath="$cache_dir/$filename.$extension"
+else
+    filepath="$cache_dir/$filename"
+fi
+
+# Check if file exists
+if [ -f "$filepath" ]; then
+  if [ "$check_exists_only" = true ]; then
+    echo "$filepath"
+    exit 0
+  elif [ "$force_download" = false ]; then
+    echo "$filepath"
+    exit 0
+  fi
+elif [ "$check_exists_only" = true ]; then
+  err "No cache exists for $url"
+  exit 2
+fi
+
+# Download the file
+if ! curl -s -L "$url" -o "$filepath"; then
+  err "Failed to download $url"
+  rm -f "$filepath"
+  exit 3
+fi
+
+# Output the filepath
+echo "$filepath"
+exit 0
